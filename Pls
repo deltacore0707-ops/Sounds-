@@ -1,0 +1,679 @@
+-- DEOBFUSCATION BY SLAXER
+-- SERVER: https://discord.gg/TNCNa3V6R
+
+local RanTimes = 0
+
+local Connection = game:GetService("RunService").Heartbeat:Connect(function()
+    RanTimes += 1
+end)
+
+repeat
+    task.wait()
+until RanTimes >= 2
+
+Connection:Disconnect()
+
+local player = game.Players.LocalPlayer
+local Player = player
+local playerGui = player:WaitForChild("PlayerGui")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+
+local Connections = {}
+local Enabled = {
+    InfJump = false,
+    ControllerMode = true
+}
+local Values = {
+    JumpCooldown = 3
+}
+local IsBinding = false
+
+local SaveFileName = "NinesAntiBatSettings.json"
+local uiScaleValue = 1
+
+pcall(function()
+    if readfile and isfile and isfile(SaveFileName) then
+        local data = HttpService:JSONDecode(readfile(SaveFileName))
+        if data then
+            if data.UIScale then
+                uiScaleValue = tonumber(data.UIScale) or 1
+            end
+            if data.JumpCooldown then
+                Values.JumpCooldown = tonumber(data.JumpCooldown) or 3
+            end
+        end
+    end
+end)
+
+local function saveSettings()
+    pcall(function()
+        if writefile then
+            local data = {
+                UIScale = uiScaleValue,
+                JumpCooldown = Values.JumpCooldown
+            }
+            writefile(SaveFileName, HttpService:JSONEncode(data))
+        end
+    end)
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "NinesAntiBatUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = playerGui
+
+local UIScale = Instance.new("UIScale")
+UIScale.Scale = uiScaleValue
+UIScale.Parent = ScreenGui
+
+local MainPanel = Instance.new("Frame")
+MainPanel.Name = "MainPanel"
+MainPanel.Size = UDim2.new(0, 320, 0, 245)
+MainPanel.Position = UDim2.new(0.5, -160, 0.5, -122)
+MainPanel.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+MainPanel.Active = true
+MainPanel.Draggable = true
+MainPanel.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainPanel
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(255, 255, 255)
+MainStroke.Thickness = 1.5
+MainStroke.Parent = MainPanel
+
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.Size = UDim2.new(1, -95, 0, 40)
+Title.Position = UDim2.new(0, 15, 0, 5)
+Title.BackgroundTransparency = 1
+Title.Text = "Nines Anti Bat"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = MainPanel
+
+local MinButton = Instance.new("TextButton")
+MinButton.Name = "MinimizeButton"
+MinButton.Size = UDim2.new(0, 20, 0, 20)
+MinButton.Position = UDim2.new(1, -30, 0, 15)
+MinButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MinButton.Text = "-"
+MinButton.TextColor3 = Color3.fromRGB(150, 150, 150)
+MinButton.Font = Enum.Font.GothamBold
+MinButton.TextSize = 14
+MinButton.AutoButtonColor = false
+MinButton.ZIndex = 10
+MinButton.Parent = MainPanel
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 6)
+MinCorner.Parent = MinButton
+
+local SettingsButton = Instance.new("TextButton")
+SettingsButton.Name = "SettingsButton"
+SettingsButton.Size = UDim2.new(0, 20, 0, 20)
+SettingsButton.Position = UDim2.new(1, -55, 0, 15)
+SettingsButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+SettingsButton.Text = "â"
+SettingsButton.TextColor3 = Color3.fromRGB(150, 150, 150)
+SettingsButton.Font = Enum.Font.GothamBold
+SettingsButton.TextSize = 12
+SettingsButton.AutoButtonColor = false
+SettingsButton.ZIndex = 10
+SettingsButton.Parent = MainPanel
+
+local SettingsCorner = Instance.new("UICorner")
+SettingsCorner.CornerRadius = UDim.new(0, 6)
+SettingsCorner.Parent = SettingsButton
+
+local SettingsPanel = Instance.new("Frame")
+SettingsPanel.Name = "SettingsPanel"
+SettingsPanel.Size = UDim2.new(0, 240, 0, 110)
+SettingsPanel.Position = UDim2.new(0.5, -120, 0.5, -55)
+SettingsPanel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+SettingsPanel.Visible = false
+SettingsPanel.Active = true
+SettingsPanel.ZIndex = 20
+SettingsPanel.Parent = ScreenGui
+
+local SettingsPanelCorner = Instance.new("UICorner")
+SettingsPanelCorner.CornerRadius = UDim.new(0, 10)
+SettingsPanelCorner.Parent = SettingsPanel
+
+local SettingsPanelStroke = Instance.new("UIStroke")
+SettingsPanelStroke.Color = Color3.fromRGB(255, 255, 255)
+SettingsPanelStroke.Thickness = 1.5
+SettingsPanelStroke.Parent = SettingsPanel
+
+local SettingsTitle = Instance.new("TextLabel")
+SettingsTitle.Name = "SettingsTitle"
+SettingsTitle.Size = UDim2.new(1, 0, 0, 30)
+SettingsTitle.Position = UDim2.new(0, 0, 0, 5)
+SettingsTitle.BackgroundTransparency = 1
+SettingsTitle.Text = "UI Scale Settings"
+SettingsTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+SettingsTitle.Font = Enum.Font.GothamBold
+SettingsTitle.TextSize = 13
+SettingsTitle.ZIndex = 20
+SettingsTitle.Parent = SettingsPanel
+
+local ScaleValueLabel = Instance.new("TextLabel")
+ScaleValueLabel.Name = "ScaleValueLabel"
+ScaleValueLabel.Size = UDim2.new(1, 0, 0, 20)
+ScaleValueLabel.Position = UDim2.new(0, 0, 0, 35)
+ScaleValueLabel.BackgroundTransparency = 1
+ScaleValueLabel.Text = "Scale: " .. string.format("%.2f", uiScaleValue)
+ScaleValueLabel.TextColor3 = Color3.fromRGB(170, 170, 170)
+ScaleValueLabel.Font = Enum.Font.GothamMedium
+ScaleValueLabel.TextSize = 12
+ScaleValueLabel.ZIndex = 20
+ScaleValueLabel.Parent = SettingsPanel
+
+local SliderBar = Instance.new("Frame")
+SliderBar.Name = "SliderBar"
+SliderBar.Size = UDim2.new(1, -40, 0, 6)
+SliderBar.Position = UDim2.new(0, 20, 0, 75)
+SliderBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SliderBar.ZIndex = 20
+SliderBar.Parent = SettingsPanel
+
+local SliderBarCorner = Instance.new("UICorner")
+SliderBarCorner.CornerRadius = UDim.new(1, 0)
+SliderBarCorner.Parent = SliderBar
+
+local SliderFill = Instance.new("Frame")
+SliderFill.Name = "SliderFill"
+local minScale, maxScale = 0.5, 1.5
+local initialAlpha = math.clamp((uiScaleValue - minScale) / (maxScale - minScale), 0, 1)
+SliderFill.Size = UDim2.new(initialAlpha, 0, 1, 0)
+SliderFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SliderFill.ZIndex = 20
+SliderFill.Parent = SliderBar
+
+local SliderFillCorner = Instance.new("UICorner")
+SliderFillCorner.CornerRadius = UDim.new(1, 0)
+SliderFillCorner.Parent = SliderFill
+
+local SliderButton = Instance.new("TextButton")
+SliderButton.Name = "SliderButton"
+SliderButton.Size = UDim2.new(0, 16, 0, 16)
+SliderButton.Position = UDim2.new(initialAlpha, -8, 0.5, -8)
+SliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SliderButton.Text = ""
+SliderButton.AutoButtonColor = false
+SliderButton.ZIndex = 21
+SliderButton.Parent = SliderBar
+
+local SliderButtonCorner = Instance.new("UICorner")
+SliderButtonCorner.CornerRadius = UDim.new(1, 0)
+SliderButtonCorner.Parent = SliderButton
+
+local draggingSlider = false
+
+SliderButton.MouseButton1Down:Connect(function()
+    draggingSlider = true
+end)
+
+SliderBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingSlider = true
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if draggingSlider then
+            draggingSlider = false
+            saveSettings()
+        end
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if draggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local absPos = SliderBar.AbsolutePosition.X
+        local absSize = SliderBar.AbsoluteSize.X
+        local mousePos = input.Position.X
+        
+        local alpha = math.clamp((mousePos - absPos) / absSize, 0, 1)
+        local calculatedScale = minScale + (maxScale - minScale) * alpha
+        
+        calculatedScale = math.floor(calculatedScale * 100 + 0.5) / 100
+        
+        UIScale.Scale = calculatedScale
+        uiScaleValue = calculatedScale
+        
+        SliderFill.Size = UDim2.new(alpha, 0, 1, 0)
+        SliderButton.Position = UDim2.new(alpha, -8, 0.5, -8)
+        ScaleValueLabel.Text = "Scale: " .. string.format("%.2f", calculatedScale)
+    end
+end)
+
+SettingsButton.MouseButton1Click:Connect(function()
+    SettingsPanel.Visible = not SettingsPanel.Visible
+end)
+
+local SectionContainer = Instance.new("Frame")
+SectionContainer.Name = "SectionContainer"
+SectionContainer.Size = UDim2.new(1, -30, 0, 55)
+SectionContainer.Position = UDim2.new(0, 15, 0, 48)
+SectionContainer.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+SectionContainer.Parent = MainPanel
+
+local SectionCorner = Instance.new("UICorner")
+SectionCorner.CornerRadius = UDim.new(0, 10)
+SectionCorner.Parent = SectionContainer
+
+local SectionStroke = Instance.new("UIStroke")
+SectionStroke.Color = Color3.fromRGB(255, 255, 255)
+SectionStroke.Thickness = 1.5
+SectionStroke.Parent = SectionContainer
+
+local ToggleLabel = Instance.new("TextLabel")
+ToggleLabel.Name = "ToggleLabel"
+ToggleLabel.Size = UDim2.new(0, 150, 1, 0)
+ToggleLabel.Position = UDim2.new(0, 15, 0, 0)
+ToggleLabel.BackgroundTransparency = 1
+ToggleLabel.Text = "ANTI BAT"
+ToggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleLabel.Font = Enum.Font.GothamBold
+ToggleLabel.TextSize = 13
+ToggleLabel.TextXAlignment = Enum.TextXAlignment.Left
+ToggleLabel.Parent = SectionContainer
+
+local ToggleBg = Instance.new("TextButton")
+ToggleBg.Name = "ToggleBg"
+ToggleBg.Size = UDim2.new(0, 48, 0, 24)
+ToggleBg.Position = UDim2.new(1, -65, 0.5, -12)
+ToggleBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+ToggleBg.Text = ""
+ToggleBg.AutoButtonColor = false
+ToggleBg.ZIndex = 1
+ToggleBg.Parent = SectionContainer
+
+local ToggleBgCorner = Instance.new("UICorner")
+ToggleBgCorner.CornerRadius = UDim.new(1, 0)
+ToggleBgCorner.Parent = ToggleBg
+
+local ToggleKnob = Instance.new("Frame")
+ToggleKnob.Name = "ToggleKnob"
+ToggleKnob.Size = UDim2.new(0, 18, 0, 18)
+ToggleKnob.Position = UDim2.new(0, 3, 0.5, -9)
+ToggleKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ToggleKnob.ZIndex = 2
+ToggleKnob.Parent = ToggleBg
+
+local ToggleKnobCorner = Instance.new("UICorner")
+ToggleKnobCorner.CornerRadius = UDim.new(1, 0)
+ToggleKnobCorner.Parent = ToggleKnob
+
+local InfJumpContainer = Instance.new("Frame")
+InfJumpContainer.Name = "InfJumpContainer"
+InfJumpContainer.Size = UDim2.new(1, -30, 0, 55)
+InfJumpContainer.Position = UDim2.new(0, 15, 0, 113)
+InfJumpContainer.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+InfJumpContainer.Parent = MainPanel
+
+local InfJumpCorner = Instance.new("UICorner")
+InfJumpCorner.CornerRadius = UDim.new(0, 10)
+InfJumpCorner.Parent = InfJumpContainer
+
+local InfJumpStroke = Instance.new("UIStroke")
+InfJumpStroke.Color = Color3.fromRGB(255, 255, 255)
+InfJumpStroke.Thickness = 1.5
+InfJumpStroke.Parent = InfJumpContainer
+
+local InfJumpLabel = Instance.new("TextLabel")
+InfJumpLabel.Name = "InfJumpLabel"
+InfJumpLabel.Size = UDim2.new(0, 150, 1, 0)
+InfJumpLabel.Position = UDim2.new(0, 15, 0, 0)
+InfJumpLabel.BackgroundTransparency = 1
+InfJumpLabel.Text = "INFINITE JUMP"
+InfJumpLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+InfJumpLabel.Font = Enum.Font.GothamBold
+InfJumpLabel.TextSize = 13
+InfJumpLabel.TextXAlignment = Enum.TextXAlignment.Left
+InfJumpLabel.Parent = InfJumpContainer
+
+local InfJumpToggleBg = Instance.new("TextButton")
+InfJumpToggleBg.Name = "InfJumpToggleBg"
+InfJumpToggleBg.Size = UDim2.new(0, 48, 0, 24)
+InfJumpToggleBg.Position = UDim2.new(1, -65, 0.5, -12)
+InfJumpToggleBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+InfJumpToggleBg.Text = ""
+InfJumpToggleBg.AutoButtonColor = false
+InfJumpToggleBg.ZIndex = 1
+InfJumpToggleBg.Parent = InfJumpContainer
+
+local InfJumpToggleBgCorner = Instance.new("UICorner")
+InfJumpToggleBgCorner.CornerRadius = UDim.new(1, 0)
+InfJumpToggleBgCorner.Parent = InfJumpToggleBg
+
+local InfJumpToggleKnob = Instance.new("Frame")
+InfJumpToggleKnob.Name = "InfJumpToggleKnob"
+InfJumpToggleKnob.Size = UDim2.new(0, 18, 0, 18)
+InfJumpToggleKnob.Position = UDim2.new(0, 3, 0.5, -9)
+InfJumpToggleKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+InfJumpToggleKnob.ZIndex = 2
+InfJumpToggleKnob.Parent = InfJumpToggleBg
+
+local InfJumpToggleKnobCorner = Instance.new("UICorner")
+InfJumpToggleKnobCorner.CornerRadius = UDim.new(1, 0)
+InfJumpToggleKnobCorner.Parent = InfJumpToggleKnob
+
+local CooldownContainer = Instance.new("Frame")
+CooldownContainer.Name = "CooldownContainer"
+CooldownContainer.Size = UDim2.new(1, -30, 0, 55)
+CooldownContainer.Position = UDim2.new(0, 15, 0, 178)
+CooldownContainer.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+CooldownContainer.Parent = MainPanel
+
+local CooldownCorner = Instance.new("UICorner")
+CooldownCorner.CornerRadius = UDim.new(0, 10)
+CooldownCorner.Parent = CooldownContainer
+
+local CooldownStroke = Instance.new("UIStroke")
+CooldownStroke.Color = Color3.fromRGB(255, 255, 255)
+CooldownStroke.Thickness = 1.5
+CooldownStroke.Parent = CooldownContainer
+
+local CooldownLabel = Instance.new("TextLabel")
+CooldownLabel.Name = "CooldownLabel"
+CooldownLabel.Size = UDim2.new(0, 150, 1, 0)
+CooldownLabel.Position = UDim2.new(0, 15, 0, 0)
+CooldownLabel.BackgroundTransparency = 1
+CooldownLabel.Text = "JUMP COOLDOWN"
+CooldownLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+CooldownLabel.Font = Enum.Font.GothamBold
+CooldownLabel.TextSize = 13
+CooldownLabel.TextXAlignment = Enum.TextXAlignment.Left
+CooldownLabel.Parent = CooldownContainer
+
+local CooldownInput = Instance.new("TextBox")
+CooldownInput.Name = "CooldownInput"
+CooldownInput.Size = UDim2.new(0, 48, 0, 28)
+CooldownInput.Position = UDim2.new(1, -65, 0.5, -14)
+CooldownInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+CooldownInput.Text = tostring(Values.JumpCooldown)
+CooldownInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+CooldownInput.Font = Enum.Font.GothamBold
+CooldownInput.TextSize = 13
+CooldownInput.Parent = CooldownContainer
+
+local CooldownInputCorner = Instance.new("UICorner")
+CooldownInputCorner.CornerRadius = UDim.new(0, 6)
+CooldownInputCorner.Parent = CooldownInput
+
+CooldownInput.FocusLost:Connect(function()
+    local val = tonumber(CooldownInput.Text)
+    if val then
+        Values.JumpCooldown = val
+        saveSettings()
+    else
+        CooldownInput.Text = tostring(Values.JumpCooldown)
+    end
+end)
+
+local MinimizedContainer = Instance.new("Frame")
+MinimizedContainer.Name = "MinimizedContainer"
+MinimizedContainer.Size = UDim2.new(0, 200, 0, 120)
+MinimizedContainer.Position = UDim2.new(0.5, -100, 0.5, -60)
+MinimizedContainer.BackgroundTransparency = 1
+MinimizedContainer.Visible = false
+MinimizedContainer.Active = true
+MinimizedContainer.Draggable = true
+MinimizedContainer.Parent = ScreenGui
+
+local OpenButton = Instance.new("TextButton")
+OpenButton.Name = "OpenButton"
+OpenButton.Size = UDim2.new(0, 60, 0, 60)
+OpenButton.Position = UDim2.new(0.5, -30, 0, 0)
+OpenButton.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+OpenButton.Text = "NINES"
+OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+OpenButton.Font = Enum.Font.GothamBold
+OpenButton.TextSize = 13
+OpenButton.AutoButtonColor = false
+OpenButton.Parent = MinimizedContainer
+
+local OpenButtonCorner = Instance.new("UICorner")
+OpenButtonCorner.CornerRadius = UDim.new(0, 14)
+OpenButtonCorner.Parent = OpenButton
+
+local OpenButtonStroke = Instance.new("UIStroke")
+OpenButtonStroke.Color = Color3.fromRGB(255, 255, 255)
+OpenButtonStroke.Thickness = 1.5
+OpenButtonStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+OpenButtonStroke.Parent = OpenButton
+
+local MinTitle = Instance.new("TextLabel")
+MinTitle.Name = "MinTitle"
+MinTitle.Size = UDim2.new(1, 0, 0, 25)
+MinTitle.Position = UDim2.new(0, 0, 0, 70)
+MinTitle.BackgroundTransparency = 1
+MinTitle.Text = "Nines Anti Bat"
+MinTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinTitle.Font = Enum.Font.GothamBold
+MinTitle.TextSize = 16
+MinTitle.Parent = MinimizedContainer
+
+local MinSubtext = Instance.new("TextLabel")
+MinSubtext.Name = "MinSubtext"
+MinSubtext.Size = UDim2.new(1, 0, 0, 20)
+MinSubtext.Position = UDim2.new(0, 0, 0, 95)
+MinSubtext.BackgroundTransparency = 1
+MinSubtext.Text = "discord.gg/nines"
+MinSubtext.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinSubtext.Font = Enum.Font.GothamBold
+MinSubtext.TextSize = 13
+MinSubtext.Parent = MinimizedContainer
+
+local isToggled = false
+local batTPConnections = {}
+local heartbeatConnection = nil
+
+local function startAutoTPBatDetector()
+    if heartbeatConnection then return end
+    
+    heartbeatConnection = RunService.Heartbeat:Connect(function()
+        if not isToggled then return end
+        
+        local myChar = player.Character
+        local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+        if not myRoot or not myHum then return end
+        
+        for _, p in ipairs(game:GetService("Players"):GetPlayers()) do
+            if p ~= player and p.Character then
+                local theirHum = p.Character:FindFirstChildOfClass("Humanoid")
+                local animator = theirHum and theirHum:FindFirstChildOfClass("Animator")
+                local hasBat = false
+                
+                for _, child in ipairs(p.Character:GetChildren()) do
+                    if child:IsA("Tool") and string.find(string.lower(child.Name), "bat") then
+                        hasBat = true
+                        break
+                    end
+                end
+                
+                if hasBat and animator and not batTPConnections[p] then
+                    batTPConnections[p] = animator.AnimationPlayed:Connect(function(track)
+                        if not isToggled then return end
+                        
+                        if track.Priority == Enum.AnimationPriority.Action or 
+                           track.Priority == Enum.AnimationPriority.Action2 or 
+                           track.Priority == Enum.AnimationPriority.Action3 or 
+                           track.Priority == Enum.AnimationPriority.Action4 then
+                            if myHum.FloorMaterial == Enum.Material.Air then
+                                local rp = RaycastParams.new()
+                                rp.FilterDescendantsInstances = {myChar}
+                                rp.FilterType = Enum.RaycastFilterType.Exclude
+                                
+                                local rr = workspace:Raycast(myRoot.Position, Vector3.new(0, -2000, 0), rp)
+                                if rr then
+                                    local off = (myHum.HipHeight or 2) + (myRoot.Size.Y / 2) + 0.1
+                                    myRoot.CFrame = CFrame.new(myRoot.Position.X, rr.Position.Y + off, myRoot.Position.Z) * myRoot.CFrame.Rotation
+                                    myRoot.AssemblyLinearVelocity = Vector3.new(myRoot.AssemblyLinearVelocity.X, 0, myRoot.AssemblyLinearVelocity.Z)
+                                    local bp = myChar:FindFirstChild("SpeedBypass")
+                                    if bp then bp.Velocity = Vector3.new(bp.Velocity.X, 0, bp.Velocity.Z) end
+                                end
+                            end
+                        end
+                    end)
+                elseif not hasBat and batTPConnections[p] then
+                    batTPConnections[p]:Disconnect()
+                    batTPConnections[p] = nil
+                end
+            end
+        end
+    end)
+end
+
+local function stopAutoTPBatDetector()
+    if heartbeatConnection then 
+        heartbeatConnection:Disconnect() 
+        heartbeatConnection = nil 
+    end
+    for _, conn in pairs(batTPConnections) do 
+        conn:Disconnect() 
+    end
+    batTPConnections = {}
+end
+
+local jumpPower = 50
+local lastInfJumpTime = 0
+local consecutiveJumps = 0
+
+local function startInfJump()
+    if Connections.InfJump then return end
+    Connections.InfJump = RunService.Heartbeat:Connect(function()
+        if not Enabled.InfJump or IsBinding then return end
+        
+        local char = Player.Character
+        if not char then return end
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not humanoid or not root then return end
+        
+        local currentCooldown = (Values.JumpCooldown or 3) / 10
+        
+        if humanoid.FloorMaterial ~= Enum.Material.Air and (tick() - lastInfJumpTime > currentCooldown + 0.05) then
+            consecutiveJumps = 0
+        end
+
+        local isHoldingJump = false
+        if not UserInputService:GetFocusedTextBox() then
+            isHoldingJump = UserInputService:IsKeyDown(Enum.KeyCode.Space)
+            if Enabled.ControllerMode then 
+                pcall(function() 
+                    isHoldingJump = isHoldingJump or UserInputService:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.ButtonA) 
+                end) 
+            end
+        end
+        
+        if humanoid.Jump then isHoldingJump = true end
+        
+        if isHoldingJump and (tick() - lastInfJumpTime >= currentCooldown) then
+            lastInfJumpTime = tick()
+            if Enabled.InfJump then
+                root.AssemblyLinearVelocity = Vector3.new(root.AssemblyLinearVelocity.X, jumpPower, root.AssemblyLinearVelocity.Z)
+                consecutiveJumps = consecutiveJumps + 1
+            end
+        end
+    end)
+end
+
+local function stopInfJump()
+    if not Enabled.InfJump then
+        if Connections.InfJump then 
+            Connections.InfJump:Disconnect() 
+            Connections.InfJump = nil 
+        end
+    end
+end
+
+player.CharacterAdded:Connect(function()
+    if isToggled then
+        stopAutoTPBatDetector()
+        startAutoTPBatDetector()
+    end
+end)
+
+player.CharacterRemoving:Connect(function()
+    if isToggled then
+        stopAutoTPBatDetector()
+    end
+end)
+
+if isToggled then
+    startAutoTPBatDetector()
+end
+
+ToggleBg.MouseButton1Click:Connect(function()
+    isToggled = not isToggled
+    
+    local targetPos = isToggled and UDim2.new(1, -21, 0.5, -9) or UDim2.new(0, 3, 0.5, -9)
+    local targetBgColor = isToggled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(40, 40, 40)
+    local targetKnobColor = isToggled and Color3.fromRGB(10, 10, 10) or Color3.fromRGB(255, 255, 255)
+    
+    local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    
+    TweenService:Create(ToggleKnob, tweenInfo, {Position = targetPos, BackgroundColor3 = targetKnobColor}):Play()
+    TweenService:Create(ToggleBg, tweenInfo, {BackgroundColor3 = targetBgColor}):Play()
+    
+    if isToggled then
+        startAutoTPBatDetector()
+    else
+        stopAutoTPBatDetector()
+    end
+end)
+
+InfJumpToggleBg.MouseButton1Click:Connect(function()
+    Enabled.InfJump = not Enabled.InfJump
+    
+    local targetPos = Enabled.InfJump and UDim2.new(1, -21, 0.5, -9) or UDim2.new(0, 3, 0.5, -9)
+    local targetBgColor = Enabled.InfJump and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(40, 40, 40)
+    local targetKnobColor = Enabled.InfJump and Color3.fromRGB(10, 10, 10) or Color3.fromRGB(255, 255, 255)
+    
+    local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    
+    TweenService:Create(InfJumpToggleKnob, tweenInfo, {Position = targetPos, BackgroundColor3 = targetKnobColor}):Play()
+    TweenService:Create(InfJumpToggleBg, tweenInfo, {BackgroundColor3 = targetBgColor}):Play()
+    
+    if Enabled.InfJump then
+        startInfJump()
+    else
+        stopInfJump()
+    end
+end)
+
+MinButton.MouseButton1Click:Connect(function()
+    MinimizedContainer.Position = UDim2.new(
+        MainPanel.Position.X.Scale,
+        MainPanel.Position.X.Offset + (MainPanel.Size.X.Offset / 2) - (MinimizedContainer.Size.X.Offset / 2),
+        MainPanel.Position.Y.Scale,
+        MainPanel.Position.Y.Offset + (MainPanel.Size.Y.Offset / 2) - (MinimizedContainer.Size.Y.Offset / 2)
+    )
+    
+    MainPanel.Visible = false
+    MinimizedContainer.Visible = true
+end)
+
+OpenButton.MouseButton1Click:Connect(function()
+    MainPanel.Position = UDim2.new(
+        MinimizedContainer.Position.X.Scale,
+        MinimizedContainer.Position.X.Offset + (MinimizedContainer.Size.X.Offset / 2) - (MainPanel.Size.X.Offset / 2),
+        MinimizedContainer.Position.Y.Scale,
+        MinimizedContainer.Position.Y.Offset + (MinimizedContainer.Size.Y.Offset / 2) - (MainPanel.Size.Y.Offset / 2)
+    )
+    
+    MinimizedContainer.Visible = false
+    MainPanel.Visible = true
+end)
